@@ -1,0 +1,88 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0" version="26.0.3">
+  <diagram name="Página-1" id="ByPnyzdSTrtcEhe8VtN3">
+    <mxGraphModel dx="1163" dy="1794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="K6Pyr4SFYFlHtut3ddDA-1" value="Home router" style="verticalLabelPosition=bottom;sketch=0;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.router;" parent="1" vertex="1">
+          <mxGeometry x="379.35" y="120" width="55" height="36.5" as="geometry" />
+        </mxCell>
+        <mxCell id="K6Pyr4SFYFlHtut3ddDA-3" value="" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.mobile;pointerEvents=1;" parent="1" vertex="1">
+          <mxGeometry x="290" y="300" width="35" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="K6Pyr4SFYFlHtut3ddDA-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;curved=1;startArrow=classic;startFill=1;" parent="1" source="K6Pyr4SFYFlHtut3ddDA-4" target="K6Pyr4SFYFlHtut3ddDA-1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="K6Pyr4SFYFlHtut3ddDA-4" value="" style="image;points=[];aspect=fixed;html=1;align=center;shadow=0;dashed=0;image=img/lib/allied_telesis/computer_and_terminals/Laptop.svg;" parent="1" vertex="1">
+          <mxGeometry x="189.35" y="227.4" width="51.86" height="52.6" as="geometry" />
+        </mxCell>
+        <mxCell id="K6Pyr4SFYFlHtut3ddDA-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;curved=1;startArrow=classic;startFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" target="K6Pyr4SFYFlHtut3ddDA-1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="324.35" y="325" as="sourcePoint" />
+            <mxPoint x="520.35" y="204.95" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-12" value="Internet" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="316.85" y="-180" width="180" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-14" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn4.iconfinder.com/data/icons/evil-icons-user-interface/64/download-128.png;align=center;" vertex="1" parent="1">
+          <mxGeometry x="426.85" y="-30.000000000000014" width="41.3" height="41.3" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0.923;entryDx=0;entryDy=0;entryPerimeter=0;shape=link;" edge="1" parent="1" source="K6Pyr4SFYFlHtut3ddDA-2" target="WwsZdTVqHZh9wnNg2Ymx-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0.923;entryDx=0;entryDy=0;entryPerimeter=0;shape=link;" edge="1" parent="1" source="K6Pyr4SFYFlHtut3ddDA-1" target="K6Pyr4SFYFlHtut3ddDA-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="407" y="120" as="sourcePoint" />
+            <mxPoint x="407" y="20" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="K6Pyr4SFYFlHtut3ddDA-2" value="TAP = Raspberry Pi&lt;div&gt;(Running Tshark&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;)&lt;/span&gt;&lt;/div&gt;" style="shape=mxgraph.cisco.misc.pxf;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeColor=#ffffff;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;direction=west;" parent="1" vertex="1">
+          <mxGeometry x="386.85" y="-10" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-17" value="Home router" style="verticalLabelPosition=bottom;sketch=0;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.router;" vertex="1" parent="1">
+          <mxGeometry x="800" y="1.75" width="55" height="36.5" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="WwsZdTVqHZh9wnNg2Ymx-18" target="WwsZdTVqHZh9wnNg2Ymx-28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-18" value="" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.mobile;pointerEvents=1;" vertex="1" parent="1">
+          <mxGeometry x="720.65" y="360" width="35" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="WwsZdTVqHZh9wnNg2Ymx-20" target="WwsZdTVqHZh9wnNg2Ymx-28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-20" value="" style="image;points=[];aspect=fixed;html=1;align=center;shadow=0;dashed=0;image=img/lib/allied_telesis/computer_and_terminals/Laptop.svg;" vertex="1" parent="1">
+          <mxGeometry x="660" y="290" width="51.86" height="52.6" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-22" value="Internet" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="737.5" y="-180" width="180" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-23" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn4.iconfinder.com/data/icons/evil-icons-user-interface/64/download-128.png;align=center;" vertex="1" parent="1">
+          <mxGeometry x="847.5" y="59.999999999999986" width="41.3" height="41.3" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-25" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0.923;entryDx=0;entryDy=0;entryPerimeter=0;shape=link;" edge="1" parent="1" source="WwsZdTVqHZh9wnNg2Ymx-17" target="WwsZdTVqHZh9wnNg2Ymx-26">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="827.65" y="120" as="sourcePoint" />
+            <mxPoint x="827.65" y="20" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-26" value="TAP = Raspberry Pi&lt;div&gt;(Running Tshark&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;)&lt;/span&gt;&lt;/div&gt;" style="shape=mxgraph.cisco.misc.pxf;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeColor=#ffffff;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;direction=west;" vertex="1" parent="1">
+          <mxGeometry x="807.5" y="80" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-27" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;shape=link;" edge="1" parent="1" target="WwsZdTVqHZh9wnNg2Ymx-28">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="827.3" y="130" as="sourcePoint" />
+            <mxPoint x="827.3" y="167" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-28" value="&lt;span&gt;Main mesh-network node&lt;/span&gt;" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image=img/lib/active_directory/generic_node.svg;" vertex="1" parent="1">
+          <mxGeometry x="802.5" y="190" width="50" height="49" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0.941;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="WwsZdTVqHZh9wnNg2Ymx-17" target="WwsZdTVqHZh9wnNg2Ymx-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

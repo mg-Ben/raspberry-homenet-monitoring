@@ -1,0 +1,54 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0" version="26.0.4">
+  <diagram name="Página-1" id="ByPnyzdSTrtcEhe8VtN3">
+    <mxGraphModel dx="1090" dy="586" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-17" value="Home router&lt;div&gt;(Running built-in software)&lt;/div&gt;" style="verticalLabelPosition=bottom;sketch=0;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.router;" parent="1" vertex="1">
+          <mxGeometry x="200" y="211.75" width="55" height="36.5" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;curved=1;" parent="1" source="WwsZdTVqHZh9wnNg2Ymx-18" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="227.5" y="250.3" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-18" value="" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.mobile;pointerEvents=1;" parent="1" vertex="1">
+          <mxGeometry x="120.64999999999998" y="371.3" width="35" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;curved=1;" parent="1" source="WwsZdTVqHZh9wnNg2Ymx-20" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="227.5" y="250.3" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-20" value="" style="image;points=[];aspect=fixed;html=1;align=center;shadow=0;dashed=0;image=img/lib/allied_telesis/computer_and_terminals/Laptop.svg;" parent="1" vertex="1">
+          <mxGeometry x="60" y="301.3" width="51.86" height="52.6" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-22" value="Internet" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="137.5" y="29.999999999999986" width="180" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-23" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn4.iconfinder.com/data/icons/evil-icons-user-interface/64/download-128.png;align=center;" parent="1" vertex="1">
+          <mxGeometry x="328.79999999999995" y="281.3" width="41.3" height="41.3" as="geometry" />
+        </mxCell>
+        <mxCell id="E8TbkyFn71X078Sl1hQG-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;curved=1;endArrow=classic;endFill=1;startArrow=classic;startFill=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;" edge="1" parent="1" source="WwsZdTVqHZh9wnNg2Ymx-26" target="WwsZdTVqHZh9wnNg2Ymx-17">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="309" y="241.3" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-26" value="Raspberry Pi&lt;div&gt;(Running database and metric&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;requests)&lt;/span&gt;&lt;/div&gt;" style="shape=mxgraph.cisco.misc.pxf;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeColor=#ffffff;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;direction=north;" parent="1" vertex="1">
+          <mxGeometry x="278.79999999999995" y="311.3" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="WwsZdTVqHZh9wnNg2Ymx-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0.941;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=classic;startFill=1;" parent="1" source="WwsZdTVqHZh9wnNg2Ymx-17" target="WwsZdTVqHZh9wnNg2Ymx-22" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="E8TbkyFn71X078Sl1hQG-1" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn4.iconfinder.com/data/icons/evil-icons-user-interface/64/download-128.png;align=center;" vertex="1" parent="1">
+          <mxGeometry x="247.5" y="181.3" width="41.3" height="41.3" as="geometry" />
+        </mxCell>
+        <mxCell id="E8TbkyFn71X078Sl1hQG-3" value="" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image=img/lib/active_directory/database.svg;" vertex="1" parent="1">
+          <mxGeometry x="370" y="285.6" width="50" height="37" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
