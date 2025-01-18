@@ -54,7 +54,7 @@ _In the diagram above, Raspberry Pi, which is running Tshark, would only have ac
 
 Although Tshark can run in promiscuous mode, that does not mean that we can capture the traffic intended for other devices in the same LAN.
 
-> What is **promiscuous mode**? It is a configuration that instructs the NIC (_Network Card Interface_) to allow the network traffic to pass to the CPU regardless of whether that traffic is addressed to it or not (in other words, it prevents the network interface from filtering out network traffic: all the traffic will pass to the CPU) [[2](#references)].
+> What is **promiscuous mode**? It is a configuration that instructs the NIC (_Network Card Interface_) to allow the network traffic to pass to the CPU regardless of whether that traffic is addressed to it or not (in other words, it prevents the network interface from filtering out network traffic: all the traffic will pass to the CPU) [[2](#references)]
 
 > And when is a packet which is not addressed to a certain NIC received by that NIC? In some cases like (1) when the packet is intended to all the machines (i.e. the destination address is not the address of the NIC, but the broadcast address `FF:FF:FF:FF:FF:FF`, like in ARP or _Address Resolution Protocol_ or DHCP or _Dynamic Host Configuration Protocol_) or (2) when a packet is intended to a subgroup of the LAN (i.e. the destination address is not the address of the NIC, but the multicast address to which the NIC is enrolled). There are some additional special cases such as when a switch receives the packet and doesn't know what machine to send to (so it decides to send it to all the machines in the same LAN)
 
@@ -101,7 +101,7 @@ This document also includes a chapter for core definitions related to WLAN commu
 
 Note that the IEEE 802.11 standard comprises other standards such as IEEE 802.11ax, IEEE 802.11ay, IEEE 802.11ba... [See [8](#references): _Standards and amendments_]. After the release of the IEEE 802.11 standard, the one which was adopted was IEEE 802.11b, followed by 802.11a, 802.11g, 802.11i, 802.11n and 802.11ac [[10](#references)]. Each one defines a maximum transmission rate (in _Mbps_) as well as different frequency bands, among others.
 
-> How can I find the standard my home router is using? You can get access to the router managing interface by connecting to 192.168.1.1 (typically) from any web browser such as Google Chrome, Mozilla or Microsoft Edge. Admin user and password will be required; to find them, you can find it in your home router label. This information is commonly shown in _WLAN 2.4G or 5G_ information. Depending on the WiFi frequency (2.4GHz or 5GHz), the set of IEEE 802.11 standards may be different and more than one standard can be applied at a time.
+> How can I find the standard my home router is using? You can get access to the router managing interface by connecting to 192.168.1.1 (typically) from any web browser such as Google Chrome, Mozilla or Microsoft Edge. Admin user and password will be required; to find them, you can find it in your home router label. This information is commonly shown in _WLAN 2.4G or 5G_ information. Depending on the WiFi frequency (2.4GHz or 5GHz), the set of IEEE 802.11 standards may be different and more than one standard can be applied at a time
 
 ### 1.4.2. WEP, WPA, WPA2 and WPA3 (Security Standard)
 WEP (_Wired Equivalent Privacy_) and WPA (_WiFi Protected Access)_ are security standards. Whilst WEP was developed by IEEE, WPA was later developed by WiFi Alliance as a solution to WEP weaknesses.
@@ -137,7 +137,15 @@ There are several ways to install an Operating System in Raspberry Pi. The follo
 ## 2.2. Downloading tools in Operating System
 The following APT (_Advanced Packaging Tool_, the tool for managing software packages in a Debian-based Systems like Ubuntu) packages are needed to configure Raspberry Pi as a Wireless Access Point:
 - `hostapd` (_Host Access Point Daemon_) [[5](#references)]: the most important one, will let us configure Raspberry Pi as an Access Point for IEEE 802.11 (i.e. the set of standards for WLANs)
-- 
+- `dhcpcd5` (_DHCP or Dynamic Host Configuration Protocol Client Daemon_) [[13](#references)]: this tools acts as a DHCP client. Summarizing, with this tool we can set a static IP address for our Raspberry Pi. This is mandatory when configuring an Access Point. 
+
+> Whenever we connect a device to an Access Point (e.g. the Home router), the device, which acts as a DHCP client, will send a request (by a DCHP discover request) to the broadcast address (255.255.255.255), as it doesn't know exactly where the DHCP server is running (DHCP server may be configured in any device, not always in AP). The DHCP server will reply with a DHCP offer that contains several IP addresses that can be chosen by the device. At this time, DHCP server doesn't know the IP address of the DHCP client, so it will send the offer to 255.255.255.255 too. Then, the device will choose one and, after making the decision, will communicate it to the DHCP server (at this moment, DHCP client already knows the IP address of the DCHP server, because DHCP server sent a DHCP offer before). Finally, DHCP server will send a DCHP acknowledgement
+
+> However, when we want to set a static IP address for our device, we have to do it carefully so as to prevent the DHCP server from assigning the same IP address to another device in the LAN
+
+- `bridge-utils`
+- `tshark`
+- `elasticsearch`
 
 ---
 ---
@@ -154,3 +162,4 @@ The following APT (_Advanced Packaging Tool_, the tool for managing software pac
 - [10] [IEEE 802.11 standards family](https://en.wikipedia.org/wiki/IEEE_802.11)
 - [11] [WiFi Alliance - WPA3 Standard Definition](https://www.wi-fi.org/system/files/WPA3%20Specification%20v3.1.pdf)
 - [12] [NIST - AES algorithm details](https://www.nist.gov/publications/advanced-encryption-standard-aes)
+- [13] [dhcpcd tool - Arch Linux documentation page](https://wiki.archlinux.org/title/Dhcpcd)
