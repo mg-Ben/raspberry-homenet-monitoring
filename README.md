@@ -11,6 +11,8 @@
         1. [IEEE 802.11 (WiFi Standard)](#141-ieee-80211-wifi-standard)
         2. [WEP, WPA, WPA2 and WPA3 (Security Standard)](#142-wep-wpa-wpa2-and-wpa3-security-standard)
         3. [AES (_Advanced Encryption Standard_) - Encryption algorithm and standard](#143-aes-advanced-encryption-standard---encryption-algorithm-and-standard)
+    5. [DHCP](#15-dhcp-dynamic-host-configuration-protocol)
+    6. [SSH](#16-ssh-secure-shell)
 2. [Configuring Raspberry Pi as a Wireless Access Point](#2-configuring-raspberry-pi-as-a-wireless-access-point)
     1. [Installing Ubuntu Server Operating System](#21-installing-ubuntu-server-operating-system)
     2. [Downloading tools in Operating System](#22-downloading-tools-in-operating-system)
@@ -52,13 +54,13 @@ In this case, the scope of the gathered metrics is limited to the device itself 
 
 _In the diagram above, Raspberry Pi, which is running Tshark, would only have access to the traffic between home router and Raspberry Pi itself (red arrow)_
 
-Although Tshark can run in promiscuous mode, that does not mean that we can capture the traffic intended for other devices in the same LAN.
+Although Tshark can run in promiscuous mode, which does not mean that we can capture the traffic intended for other devices in the same LAN.
 
 > What is **promiscuous mode**? It is a configuration that instructs the NIC (_Network Card Interface_) to allow the network traffic to pass to the CPU regardless of whether that traffic is addressed to it or not (in other words, it prevents the network interface from filtering out network traffic: all the traffic will pass to the CPU) [[2](#references)]
 
 > And when is a packet which is not addressed to a certain NIC received by that NIC? In some cases like (1) when the packet is intended to all the machines (i.e. the destination address is not the address of the NIC, but the broadcast address `FF:FF:FF:FF:FF:FF`, like in ARP or _Address Resolution Protocol_ or DHCP or _Dynamic Host Configuration Protocol_) or (2) when a packet is intended to a subgroup of the LAN (i.e. the destination address is not the address of the NIC, but the multicast address to which the NIC is enrolled). There are some additional special cases such as when a switch receives the packet and doesn't know what machine to send to (so it decides to send it to all the machines in the same LAN)
 
-There is also another option in Tshark; the **monitor mode**, that is about capturing only IEEE 802.11 frames "_in the air_" (i.e. WLAN or _Wireless Local Area Network_ packets). In this mode, the network wireless interface configured in monitor mode disconnects from the WLAN and starts sniffing packets, even those not intended to it. However, these packets are usually encrypted (and not every device in the home network is connected wirelessly), so this option is not considered here, as we want to get metrics for the whole home network.
+There is also another option in Tshark; the **monitor mode**, which is about capturing only IEEE 802.11 frames "_in the air_" (i.e. WLAN or _Wireless Local Area Network_ packets). In this mode, the network wireless interface configured in monitor mode disconnects from the WLAN and starts sniffing packets, even those not intended to it. However, these packets are usually encrypted (and not every device in the home network is connected wirelessly), so this option is not considered here, as we want to get metrics for the whole home network.
 
 ## 1.3. Monitoring models
 We can assess some approaches for monitoring the home network LAN:
@@ -119,6 +121,42 @@ AES is an algorithm to encrypt data, so it provides confidentiality (i.e. the in
 
 AES can also operate in CBC-MAC mode (_Cipher Block Chaining - Message Authentication Code_) for data authentication (i.e. the other part of the communication must be who they claim to be) and integrity (i.e. to prevent data from being altered by threat actors).
 
+## 1.5. DHCP (_Dynamic Host Configuration Protocol_)
+Each device in a network has got several **interfaces**, which are really a way to reach that device. For instance, the mobile phones have got a Wireless Antenna for WiFi, or our computers may have Ethernet links that are connected to the home router. Sometimes, even the same computer may have two ways to reach it: through an USB WiFi Antenna or through Ethernet. That's why, actually, the host themselves don't have an IP Address, but the interfaces of that host. We can depict this as follows, where we show a network diagram which faithfully reflects what a LAN really is:
+
+![Actual Home Network Diagram](/images/actual_home_network_diagram.png)
+
+The DHCP Protocol assigns to each device interface an IP Address automatically, and runs in a _DHCP Server_ which typically is the home router itself (that's why DHCP Server is a Client/Server Protocol). The provided IP Addresses belong to a certain IP Address range (e.g. the `192.168.1.*`, where `*` denotes any value between 0 and 255 or, what is the same, `192.168.1.0/24` in CIDR or _Classes Inter-Domain Routing_ notation).
+
+Furthermore, apart from the IP Address, the DHCP Server provides to each interface the following information:
+- The subnet mask, with which an interface can know whether a destination IP Address belongs to the LAN when sending a packet or it belongs to an external network
+- The gateway IP Address, which is the IP Address of the next-hop router that will route the traffic outwards (in this case, the home router itself) 
+- The DNS (_Domain Name System_) server, which will be in charge of mapping IP Addresses to Domain Names, which are more manageable than IP Addresses. The DNS Server will normally be the home router itself
+
+> You can get this per-interface information by running `ipconfig /all` on Windows or `nmcli dev show <interface>` on Linux. To display the interfaces names on Linux, `ifconfig`
+
+DHCP operation is:
+1. Interface sends a **DHCP Discover**: the interface wants to discover a DHCP Server. It doesn't have an IP Address yet, so it sends it from the source IP `0.0.0.0`. Neither does it know the target DHCP Server IP Address (it might be running in a different IP Address from 192.168.1.1), so it sends the query to the broadcast address (which means _every device in the LAN_): `255.255.255.255`
+2. All the DHCP Servers respond with a **DHCP Offer**. In this packet, source IP is the DHCP Server IP Address (say `192.168.1.1`) and the destination IP is `255.255.255.255`, as the interface does not have an IP Address yet. The DHCP Offer offers the client a pool of available IP Addresses (not used by any device in the LAN yet) to the interface
+3. The interface chooses one interface and sends a **DHCP Request**. The IP Address of the interface is not acknowledged yet by the router, so it still is `0.0.0.0`. However, the interface now knows the target IP Address of the DHCP Server that it wants to send the offer to, so the destination IP Address indeed is the DHCP Server IP Address.
+4. The DHCP Server responds with a **DHCP ACK (or _Acknowledgement_)**
+
+> This information exchange occurs whenever a new device enters the LAN. What's more: the assigned IP Addresses have an expiry date (e.g. they can expiry after 1 hour) and then they are assigned a new one from the pool.
+
+> When a device exits the LAN, the pool of available IP Addresses to offer updates
+
+Sometimes, we don't want the DHCP Server to assign a dynamic IP Address, but a **static** one. We can do it in two ways:
+1. **DCHP Reservation**: we can access to Home Router management UI (_User Interface_) by accessing to `192.168.1.1` in Web Browser. This option is typically under _DHCP Binding_ option, and we will need to specify the MAC (_Medium Access Control_) Address of the interface, which is, indeed, a constant, physical and fixed address that is assigned by the manufacturer. The MAC Address can be checked with either `ipconfig /all` on Windows or `ifconfig` on Linux
+
+> You can even find out the NIC (_Network Interface Card_) brand by using online tools such as OUI Lookup [[14](#references)]
+
+2. **Static IP Address assignation**: in this case, we force our device to have a specific IP Address by setting it in the device itself. This method depends on the underlaying Operating System and the device (whether it is a mobile phone, a computer or any other). For example, in Linux Operating Systems, this can be done with `dhcpcd` tool.
+
+> Static IP Address assignation is not recommended, as there might be another device in the LAN using the same IP Address!
+
+## 1.6. SSH (_Secure SHell_)
+
+
 # 2. Configuring Raspberry Pi as a Wireless Access Point
 You can follow [[3](#references)] on how to get started with Raspberry Pi.
 
@@ -132,16 +170,12 @@ There are several ways to install an Operating System in Raspberry Pi. The follo
 3. Run Raspberry Pi Imager and select the Raspberry Pi model (in this case, see Section [[0.1](#01-raspberry-pi---model)]), the Operating System (in this case, Ubuntu Server, as specified in Section [[0.2](#02-raspberry-pi---operating-system)]) as well as the microSD/USB where the Operating System will be loaded (in this tutorial, we are using a MicroSD, as specified in Section [[0.3](#03-raspberry-pi---hard-disk-storage)]). To this end, select _Other general-purpose OS > Ubuntu > Ubuntu Server LTS_
 4. Configure Internet connectivity (WLAN): this is optional, but recommended
 5. Configure Timezone (highly recommended to prevent NTP or _Network Time Protocol_ related problems when your Raspberry Pi connects to the local home network LAN NTP Servers)
-5. Configure hostname and user/password for SSH (_Secure SHell_)
+5. Configure hostname and user/password for [SSH](#16-ssh-secure-shell)
 
 ## 2.2. Downloading tools in Operating System
 The following APT (_Advanced Packaging Tool_, the tool for managing software packages in a Debian-based Systems like Ubuntu) packages are needed to configure Raspberry Pi as a Wireless Access Point:
 - `hostapd` (_Host Access Point Daemon_) [[5](#references)]: the most important one, will let us configure Raspberry Pi as an Access Point for IEEE 802.11 (i.e. the set of standards for WLANs)
-- `dhcpcd5` (_DHCP or Dynamic Host Configuration Protocol Client Daemon_) [[13](#references)]: this tools acts as a DHCP client. Summarizing, with this tool we can set a static IP address for our Raspberry Pi. This is mandatory when configuring an Access Point. 
-
-> Whenever we connect a device to an Access Point (e.g. the Home router), the device, which acts as a DHCP client, will send a request (by a DCHP discover request) to the broadcast address (255.255.255.255), as it doesn't know exactly where the DHCP server is running (DHCP server may be configured in any device, not always in AP). The DHCP server will reply with a DHCP offer that contains several IP addresses that can be chosen by the device. At this time, DHCP server doesn't know the IP address of the DHCP client, so it will send the offer to 255.255.255.255 too. Then, the device will choose one and, after making the decision, will communicate it to the DHCP server (at this moment, DHCP client already knows the IP address of the DCHP server, because DHCP server sent a DHCP offer before). Finally, DHCP server will send a DCHP acknowledgement
-
-> However, when we want to set a static IP address for our device, we have to do it carefully so as to prevent the DHCP server from assigning the same IP address to another device in the LAN
+- `dhcpcd5` (_[DHCP](#15-dhcp-dynamic-host-configuration-protocol) Client Daemon_) [[13](#references)]: this tools acts as a DHCP client. Summarizing, with this tool we can set a static IP address for our Raspberry Pi so that we can connect from another device. This is mandatory when configuring an Access Point
 
 - `bridge-utils`
 - `tshark`
@@ -163,3 +197,4 @@ The following APT (_Advanced Packaging Tool_, the tool for managing software pac
 - [11] [WiFi Alliance - WPA3 Standard Definition](https://www.wi-fi.org/system/files/WPA3%20Specification%20v3.1.pdf)
 - [12] [NIST - AES algorithm details](https://www.nist.gov/publications/advanced-encryption-standard-aes)
 - [13] [dhcpcd tool - Arch Linux documentation page](https://wiki.archlinux.org/title/Dhcpcd)
+- [14] [OUI Lookup Tool](https://www.wireshark.org/tools/oui-lookup.html)
