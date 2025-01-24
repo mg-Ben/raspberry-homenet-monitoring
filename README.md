@@ -13,6 +13,7 @@
         3. [AES (_Advanced Encryption Standard_) - Encryption algorithm and standard](#143-aes-advanced-encryption-standard---encryption-algorithm-and-standard)
     5. [DHCP](#15-dhcp-dynamic-host-configuration-protocol)
     6. [SSH](#16-ssh-secure-shell)
+    7. [NAT](#17-nat-network-address-translation)
 2. [Configuring Raspberry Pi as a Wireless Access Point](#2-configuring-raspberry-pi-as-a-wireless-access-point)
     1. [Installing Ubuntu Server Operating System](#21-installing-ubuntu-server-operating-system)
     2. [Downloading tools in Operating System](#22-downloading-tools-in-operating-system)
@@ -88,7 +89,9 @@ We can assess some approaches for monitoring the home network LAN:
 
 ![Wireless Access Point Monitoring](./images/wireless_ap_monitoring.drawio.png)
 
-For this project, we have chosen the latest one (_Configuring Raspberry Pi as a Wireless Access Point_).
+For this project, we have opted for latest one (_Configuring Raspberry Pi as a Wireless Access Point_). Nonetheless, the idea is quite similar to the TAP too: we want the Raspberry Pi to be a WAP, but we will also configure it as a "dumb device" that will forward all the traffic from the WiFi interface to the Ethernet one so that the home router responds (and not the Raspberry Pi itself).
+
+> Why configuring Raspberry Pi as a dumb device? The truth is that we could actually configure Raspberry Pi as a [DHCP](#15-dhcp-dynamic-host-configuration-protocol) Server, but we would need to select an IP range that doesn't overlap with the home router LAN's IP Addresses to prevent Raspberry Pi from assigning the same IP Addresses to the devices connected to it as the IP Addresses of the home router LAN. What's more: in case of configuring Raspberry Pi as a DHCP Server, note that further configuration should be made so as to let the communication between the Raspberry Pi's LAN and the home router's LAN (such as [NAT or Network Address Translation]())
 
 ## 1.4. WiFi concepts
 ### 1.4.1. IEEE 802.11 (WiFi Standard)
@@ -124,7 +127,7 @@ AES can also operate in CBC-MAC mode (_Cipher Block Chaining - Message Authentic
 ## 1.5. DHCP (_Dynamic Host Configuration Protocol_)
 Each device in a network has got several **interfaces**, which are really a way to reach that device. For instance, the mobile phones have got a Wireless Antenna for WiFi, or our computers may have Ethernet links that are connected to the home router. Sometimes, even the same computer may have two ways to reach it: through an USB WiFi Antenna or through Ethernet. That's why, actually, the host themselves don't have an IP Address, but the interfaces of that host. We can depict this as follows, where we show a network diagram which faithfully reflects what a LAN really is:
 
-![Actual Home Network Diagram](/images/actual_home_network_diagram.png)
+![Actual Home Network Diagram](/images/actual_home_network_diagram.drawio.png)
 
 The DHCP Protocol assigns to each device interface an IP Address automatically, and runs in a _DHCP Server_ which typically is the home router itself (that's why DHCP Server is a Client/Server Protocol). The provided IP Addresses belong to a certain IP Address range (e.g. the `192.168.1.*`, where `*` denotes any value between 0 and 255 or, what is the same, `192.168.1.0/24` in CIDR or _Classes Inter-Domain Routing_ notation).
 
@@ -138,23 +141,36 @@ Furthermore, apart from the IP Address, the DHCP Server provides to each interfa
 DHCP operation is:
 1. Interface sends a **DHCP Discover**: the interface wants to discover a DHCP Server. It doesn't have an IP Address yet, so it sends it from the source IP `0.0.0.0`. Neither does it know the target DHCP Server IP Address (it might be running in a different IP Address from 192.168.1.1), so it sends the query to the broadcast address (which means _every device in the LAN_): `255.255.255.255`
 2. All the DHCP Servers respond with a **DHCP Offer**. In this packet, source IP is the DHCP Server IP Address (say `192.168.1.1`) and the destination IP is `255.255.255.255`, as the interface does not have an IP Address yet. The DHCP Offer offers the client a pool of available IP Addresses (not used by any device in the LAN yet) to the interface
-3. The interface chooses one interface and sends a **DHCP Request**. The IP Address of the interface is not acknowledged yet by the router, so it still is `0.0.0.0`. However, the interface now knows the target IP Address of the DHCP Server that it wants to send the offer to, so the destination IP Address indeed is the DHCP Server IP Address.
+3. The interface chooses one interface and sends a **DHCP Request**. The IP Address of the interface is not acknowledged yet by the router, so it still is `0.0.0.0`. However, the interface now knows the target IP Address of the DHCP Server that it wants to send the offer to, so the destination IP Address is indeed the DHCP Server IP Address.
 4. The DHCP Server responds with a **DHCP ACK (or _Acknowledgement_)**
 
 > This information exchange occurs whenever a new device enters the LAN. What's more: the assigned IP Addresses have an expiry date (e.g. they can expiry after 1 hour) and then they are assigned a new one from the pool.
 
-> When a device exits the LAN, the pool of available IP Addresses to offer updates
+> When a device exits the LAN, the pool of available IP Addresses to offer is automatically updated
 
 Sometimes, we don't want the DHCP Server to assign a dynamic IP Address, but a **static** one. We can do it in two ways:
-1. **DCHP Reservation**: we can access to Home Router management UI (_User Interface_) by accessing to `192.168.1.1` in Web Browser. This option is typically under _DHCP Binding_ option, and we will need to specify the MAC (_Medium Access Control_) Address of the interface, which is, indeed, a constant, physical and fixed address that is assigned by the manufacturer. The MAC Address can be checked with either `ipconfig /all` on Windows or `ifconfig` on Linux
+1. **DCHP Reservation**: we can access to Home Router management UI (_User Interface_) by accessing to `192.168.1.1` in from Web Browser on any computer connected to the LAN. This option is typically under _DHCP Binding_ option, and we will need to specify the MAC (_Medium Access Control_) Address of the interface, which is indeed a constant, physical and fixed address that is assigned by the manufacturer. The MAC Address can be checked with either `ipconfig /all` on Windows or `ifconfig` on Linux
 
 > You can even find out the NIC (_Network Interface Card_) brand by using online tools such as OUI Lookup [[14](#references)]
 
-2. **Static IP Address assignation**: in this case, we force our device to have a specific IP Address by setting it in the device itself. This method depends on the underlaying Operating System and the device (whether it is a mobile phone, a computer or any other). For example, in Linux Operating Systems, this can be done with `dhcpcd` tool.
+2. **Static IP Address assignation**: in this case, we force our device to have a specific IP Address by setting it in the device interface itself. This method depends on the underlaying Operating System and the device (whether it is a mobile phone, a computer or any other). For example, in Linux Operating Systems, this can be done via `dhcpcd` tool.
 
 > Static IP Address assignation is not recommended, as there might be another device in the LAN using the same IP Address!
 
 ## 1.6. SSH (_Secure SHell_)
+This is a cryptographic Application Layer Protocol (based on Client-Server architecture just like [DHCP](#15-dhcp-dynamic-host-configuration-protocol)) with which we will be able to connect to a remote _SSH Server_ and control it with a CLI (_Command Line Interface_) remotely, as though we were running the CLI inside the remote host.
+
+When setting Raspberry Pi up with Ubuntu Server OS, we need to specify the user and password for SSH connection.
+
+## 1.7. NAT (_Network Address Translation_)
+In the Internet, there are lots and lots of devices (and interfaces). However, the number of IP Addresses that can be assigned to them is remarkably lower. An IP Address consists of four integer values, with 8 bits each:
+
+> E.g. `192.168.1.1 => 11000000.10100010.00000001.00000001`
+
+Consequently, there are a total of 2^32 = 4294967296 different IP Addresses, but not enough for all the devices in the world. Thus, the NAT can be used to assign any IP Address for the device interfaces inside a LAN (such as an office LAN, a home LAN, an enterprise LAN...) even though they are duplicated over the world (e.g. your mobile phone inside your home LAN may have the same IP Address as the Computer of your neighbour's LAN; let's say `192.168.1.124`). However: how can you send a packet from any device in your LAN to any device inside the neighbour's LAN? The response is: through NAT.
+
+
+
 
 
 # 2. Configuring Raspberry Pi as a Wireless Access Point
@@ -176,7 +192,6 @@ There are several ways to install an Operating System in Raspberry Pi. The follo
 The following APT (_Advanced Packaging Tool_, the tool for managing software packages in a Debian-based Systems like Ubuntu) packages are needed to configure Raspberry Pi as a Wireless Access Point:
 - `hostapd` (_Host Access Point Daemon_) [[5](#references)]: the most important one, will let us configure Raspberry Pi as an Access Point for IEEE 802.11 (i.e. the set of standards for WLANs)
 - `dhcpcd5` (_[DHCP](#15-dhcp-dynamic-host-configuration-protocol) Client Daemon_) [[13](#references)]: this tools acts as a DHCP client. Summarizing, with this tool we can set a static IP address for our Raspberry Pi so that we can connect from another device. This is mandatory when configuring an Access Point
-
 - `bridge-utils`
 - `tshark`
 - `elasticsearch`
