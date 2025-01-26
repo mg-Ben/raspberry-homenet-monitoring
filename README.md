@@ -7,17 +7,17 @@
     1. [Active/Intrusive measurements](#11-activeintrusive-measurements)
     2. [Passive/Non-Intrusive measurements](#12-passivenon-intrusive-measurements)
     3. [Monitoring models](#13-monitoring-models)
-    4. [WiFi concepts](#14-wifi-concepts)
+    4. [Core concepts](#14-core-concepts)
         1. [IEEE 802.11 (WiFi Standard)](#141-ieee-80211-wifi-standard)
         2. [WEP, WPA, WPA2 and WPA3 (Security Standard)](#142-wep-wpa-wpa2-and-wpa3-security-standard)
         3. [AES (_Advanced Encryption Standard_) - Encryption algorithm and standard](#143-aes-advanced-encryption-standard---encryption-algorithm-and-standard)
     5. [DHCP](#15-dhcp-dynamic-host-configuration-protocol)
     6. [SSH](#16-ssh-secure-shell)
     7. [NAT](#17-nat-network-address-translation)
+    8. [Important tools for this project](#18-important-tools-for-this-project)
 2. [Configuring Raspberry Pi as a Wireless Access Point](#2-configuring-raspberry-pi-as-a-wireless-access-point)
     1. [Installing Ubuntu Server Operating System](#21-installing-ubuntu-server-operating-system)
-    2. [Downloading tools in Operating System](#22-downloading-tools-in-operating-system)
-
+    2. [Preparing the setup](#22-preparing-the-setup)
 ---
 ---
 
@@ -55,7 +55,7 @@ In this case, the scope of the gathered metrics is limited to the device itself 
 
 _In the diagram above, Raspberry Pi, which is running Tshark, would only have access to the traffic between home router and Raspberry Pi itself (red arrow)_
 
-Although Tshark can run in promiscuous mode, which does not mean that we can capture the traffic intended for other devices in the same LAN.
+Although Tshark can run in promiscuous mode, that does not mean that we can capture the traffic intended for other devices in the same LAN.
 
 > What is **promiscuous mode**? It is a configuration that instructs the NIC (_Network Card Interface_) to allow the network traffic to pass to the CPU regardless of whether that traffic is addressed to it or not (in other words, it prevents the network interface from filtering out network traffic: all the traffic will pass to the CPU) [[2](#references)]
 
@@ -91,7 +91,7 @@ We can assess some approaches for monitoring the home network LAN:
 
 For this project, we have opted for latest one (_Configuring Raspberry Pi as a Wireless Access Point_). Nonetheless, the idea is quite similar to the TAP too: we want the Raspberry Pi to be a WAP, but we will also configure it as a "dumb device" that will forward all the traffic from the WiFi interface to the Ethernet one so that the home router responds (and not the Raspberry Pi itself).
 
-> Why configuring Raspberry Pi as a dumb device? The truth is that we could actually configure Raspberry Pi as a [DHCP](#15-dhcp-dynamic-host-configuration-protocol) Server, but we would need to select an IP range that doesn't overlap with the home router LAN's IP Addresses to prevent Raspberry Pi from assigning the same IP Addresses to the devices connected to it as the IP Addresses of the home router LAN. What's more: in case of configuring Raspberry Pi as a DHCP Server, note that further configuration should be made so as to let the communication between the Raspberry Pi's LAN and the home router's LAN (such as [NAT or Network Address Translation]())
+> Why configuring Raspberry Pi as a dumb device? The truth is that we could actually configure Raspberry Pi as a [DHCP](#15-dhcp-dynamic-host-configuration-protocol) Server, but we would need to select an IP range that doesn't overlap with the home router LAN's IP Addresses to prevent Raspberry Pi from assigning the same IP Addresses to the devices connected to it as those of the home router LAN. What's more: in case of configuring Raspberry Pi as a DHCP Server, note that further configuration should be made so as to let the communication between the Raspberry Pi's LAN and the home router's LAN (such as [NAT or _Network Address Translation_](#17-nat-network-address-translation))
 
 ## 1.4. WiFi concepts
 ### 1.4.1. IEEE 802.11 (WiFi Standard)
@@ -129,14 +129,16 @@ Each device in a network has got several **interfaces**, which are really a way 
 
 ![Actual Home Network Diagram](/images/actual_home_network_diagram.drawio.png)
 
-The DHCP Protocol assigns to each device interface an IP Address automatically, and runs in a _DHCP Server_ which typically is the home router itself (that's why DHCP Server is a Client/Server Protocol). The provided IP Addresses belong to a certain IP Address range (e.g. the `192.168.1.*`, where `*` denotes any value between 0 and 255 or, what is the same, `192.168.1.0/24` in CIDR or _Classes Inter-Domain Routing_ notation).
+The DHCP Protocol assigns to each device interface an IP Address automatically, and runs in a _DHCP Server_ which typically is the home router itself (that's why DHCP Server is a Client/Server Protocol). The provided IP Addresses belong to a certain IP Address range (e.g. the `192.168.1.*`, where `*` denotes any value between 0 and 255 or, what is the same, `192.168.1.0/24` in CIDR or _Classes Inter-Domain Routing_ notation. We fill with zeroes the variable part in the CIDR notation).
+
+> How can I find out the DHCP IP range my home router is providing? You can go to Home router's management interface by typing `192.168.1.1` (or your local router IP Address) from any web browser running on a device connected to the Home router's LAN and then look for _DHCP Server_ setting. You will generally see the DHCP range as well as the start and end IP Address that your router can assign to connected interfacess
 
 Furthermore, apart from the IP Address, the DHCP Server provides to each interface the following information:
 - The subnet mask, with which an interface can know whether a destination IP Address belongs to the LAN when sending a packet or it belongs to an external network
 - The gateway IP Address, which is the IP Address of the next-hop router that will route the traffic outwards (in this case, the home router itself) 
 - The DNS (_Domain Name System_) server, which will be in charge of mapping IP Addresses to Domain Names, which are more manageable than IP Addresses. The DNS Server will normally be the home router itself
 
-> You can get this per-interface information by running `ipconfig /all` on Windows or `nmcli dev show <interface>` on Linux. To display the interfaces names on Linux, `ifconfig`
+> You can get this per-interface information by running `ipconfig /all` on Windows or `nmcli dev show <interface>` on Linux. To display the interfaces names on Linux, `ifconfig` or `ip addr`
 
 DHCP operation is:
 1. Interface sends a **DHCP Discover**: the interface wants to discover a DHCP Server. It doesn't have an IP Address yet, so it sends it from the source IP `0.0.0.0`. Neither does it know the target DHCP Server IP Address (it might be running in a different IP Address from 192.168.1.1), so it sends the query to the broadcast address (which means _every device in the LAN_): `255.255.255.255`
@@ -149,7 +151,7 @@ DHCP operation is:
 > When a device exits the LAN, the pool of available IP Addresses to offer is automatically updated
 
 Sometimes, we don't want the DHCP Server to assign a dynamic IP Address, but a **static** one. We can do it in two ways:
-1. **DCHP Reservation**: we can access to Home Router management UI (_User Interface_) by accessing to `192.168.1.1` in from Web Browser on any computer connected to the LAN. This option is typically under _DHCP Binding_ option, and we will need to specify the MAC (_Medium Access Control_) Address of the interface, which is indeed a constant, physical and fixed address that is assigned by the manufacturer. The MAC Address can be checked with either `ipconfig /all` on Windows or `ifconfig` on Linux
+1. **DCHP Reservation**: we can access to Home Router management UI (_User Interface_) by accessing to `192.168.1.1` in from Web Browser on any computer connected to the LAN. This option is typically under _DHCP Binding_ option, and we will need to specify the MAC (_Medium Access Control_) Address of the interface, which is indeed a constant, physical and fixed address that is assigned by the manufacturer. The MAC Address can be checked with either `ipconfig /all` on Windows or `ifconfig` or `ip addr` on Linux
 
 > You can even find out the NIC (_Network Interface Card_) brand by using online tools such as OUI Lookup [[14](#references)]
 
@@ -169,9 +171,35 @@ In the Internet, there are lots and lots of devices (and interfaces). However, t
 
 Consequently, there are a total of 2^32 = 4294967296 different IP Addresses, but not enough for all the devices in the world. Thus, the NAT can be used to assign any IP Address for the device interfaces inside a LAN (such as an office LAN, a home LAN, an enterprise LAN...) even though they are duplicated over the world (e.g. your mobile phone inside your home LAN may have the same IP Address as the Computer of your neighbour's LAN; let's say `192.168.1.124`). However: how can you send a packet from any device in your LAN to any device inside the neighbour's LAN? The response is: through NAT.
 
+NAT magic is about taking a group of interfaces on the Internet and assigning them the same IP Address (i.e. there exists a representative IP Address for all of them). However, as you may have noticed, this wouldn't work in a real scenario, as the devices don't have a unique IP Address that identifies them. Therefore, the truth behind the NAT magic is that the devices are identified by the **ports** running on the representative device rather than the IP Address.
 
+For example, in home NAT, the representative device is the home router and, more specifically, the interface that connects the router outwards (i.e. the ONT for _Fiber To The Home_ installations, which is connected through Optical Fiber to the ISP). In the image below, the IP Address for the ONT would be depicted in the orange square (called _Public IP Address_). Nonetheless, note that the inner IP Address that represents the home router is `192.168.1.1` (or similar, depending on your home configuration).
 
+![NAT concept](images/NAT_concept.drawio.png)
 
+The NAT works as follows:
+
+![NAT concept - A packet journey](images/NAT_concept_packet_journey.drawio.png)
+
+- We send a packet from a device in the Home LAN. For example, from our computer to a public server on the Internet (say `1.2.3.4`). The source IP is the IP Address of the computer, (in the example, `192.168.1.280`) and the destination IP is `1.2.3.4`. The rouce port is, for example, `8055` and the destination is `1234`
+- The router receives that packet and overwrites the source IP Address from `192.168.1.280` to the public one (`37.223.16.117`) and the source port from `8055` to `2551`. Likewise, will store the IP Address of the computer (`192.168.1.280`) in the NAT table together with the source port (`8055`) to know to whom send the packet when the external server replies
+- When the external server wants to respond, it will do it towards `37.223.16.117:2551`
+- The router knows that `2551` is attached to `192.168.1.280:8055` because it stored that information in the NAT table
+
+> To sum up: each device in the LAN have got an attached port (in the example, `2551`) that allows us to identify them.
+
+And what about connecting directly to some device which is behind a NAT? For example, we want now to communicate to _My neighbor's computer_. We would need to know beforehand which is the port in the neighbor's NAT table that is attached to the destination device. However, this is usually dynamic and we typically have no access to this information (this is why NAT also grants privacy to the inner devices in the LAN), unless our neighbor has explicitly specified a static port for some running port of some device inside their LAN. This can be done via **Port Forwarding** (commonly in home router settings).
+
+> How to find out your public IP Address? You can go to ifconfig.me [[15](#references)]
+
+## 1.8. Important tools for this project
+The following APT (_Advanced Packaging Tool_, the tool for managing software packages in a Debian-based Systems like Ubuntu) packages are needed to configure Raspberry Pi as a Wireless Access Point:
+- `hostapd` (_Host Access Point Daemon_) [[5](#references)]: the most important one, will let us configure Raspberry Pi as an Access Point for IEEE 802.11 (i.e. the set of standards for WLANs)
+- `dhcpcd5` (_[DHCP](#15-dhcp-dynamic-host-configuration-protocol) Client Daemon_) [[13](#references)]: this tool acts as a DHCP client. Summarizing, with this tool we can set a static IP address for our Raspberry Pi so that we can connect from another device. This is mandatory when configuring an Access Point
+- `bridge-utils` [[16](#references)]: with this tool, we are able to merge two network interfaces into the same one. In this way, every traffic that passes to one of the bridged interfaces will be forwarded to the other one
+- `wireless-tools`
+- `tshark`
+- `elasticsearch`
 
 # 2. Configuring Raspberry Pi as a Wireless Access Point
 You can follow [[3](#references)] on how to get started with Raspberry Pi.
@@ -188,13 +216,51 @@ There are several ways to install an Operating System in Raspberry Pi. The follo
 5. Configure Timezone (highly recommended to prevent NTP or _Network Time Protocol_ related problems when your Raspberry Pi connects to the local home network LAN NTP Servers)
 5. Configure hostname and user/password for [SSH](#16-ssh-secure-shell)
 
-## 2.2. Downloading tools in Operating System
-The following APT (_Advanced Packaging Tool_, the tool for managing software packages in a Debian-based Systems like Ubuntu) packages are needed to configure Raspberry Pi as a Wireless Access Point:
-- `hostapd` (_Host Access Point Daemon_) [[5](#references)]: the most important one, will let us configure Raspberry Pi as an Access Point for IEEE 802.11 (i.e. the set of standards for WLANs)
-- `dhcpcd5` (_[DHCP](#15-dhcp-dynamic-host-configuration-protocol) Client Daemon_) [[13](#references)]: this tools acts as a DHCP client. Summarizing, with this tool we can set a static IP address for our Raspberry Pi so that we can connect from another device. This is mandatory when configuring an Access Point
-- `bridge-utils`
-- `tshark`
-- `elasticsearch`
+## 2.2. Preparing the setup
+In this section we describe the setup to start configuring the Raspberry Pi. The target setup is depicted below:
+
+![Raspberry WAP - Setup](images/Raspberry_setup.drawio.png)
+
+Hereafter:
+- The Ethernet interface that will carry the traffic between Raspberry Pi and home router will be referred to as `eth0`
+- The Wireless interface that will be configured as a WAP will be referred to as `wlan0`
+- The bridge interface that interconnects `wlan0` with `eth0` will be referred to as `br0`
+
+> For testing purposes, it is highly recommended to use a **USB to Ethernet Adapter**. Generally, we can connect to Raspberry Pi by SSH via the wireless interface of Raspberry Pi (i.e. `wlan0`). However, when connecting to `wlan0` through SSH, we will need `wlan0` to be connected to the home router. If we connect to Raspberry Pi through `wlan0` using SSH and then configure `wlan0` as a WAP, `wlan0` will **disconnect** from home router LAN and we will lose access by SSH. We could connect through `eth0`, but the same happens when we configure the bridge interface (`br0` in the image above); we would lose access as soon as we add `eth0` to the bridge interface
+
+First of all, we need to set a fixed IP Address for the SSH auxiliar interface so that we can connect to it specifying always the same IP Address. This is recommended because, otherwise, we would need to enter router management user interface in web browser to find out the IP Address that our router has assigned to that interface whenever we want to do tests, which may be inconvenient. For this purpose, see [DHCP](#15-dhcp-dynamic-host-configuration-protocol) protocol (_IP reservation is recommended for this. If your router doesn't support IP reservation, you can opt for static IP with dhcpcd_).
+
+> To configure a **static IP** for some interface on Raspberry Pi, you can use `dhcpcd` tool. To do so, install `dhcpcd` on Raspberry Pi (`sudo apt upgrade && sudo apt install dhcpcd5`) and edit `/etc/dhcpcd.conf` like:
+```
+interface <iface_name>                          #You can get the iface_name with ifconfig or ip addr command
+static ip_address=<desired_IP>/<subnet_mask>
+```
+> For instance: my home router LAN CIDR is `192.168.1.0/24`, starting from `192.168.1.128` up to `192.168.1.255`. Hence, we can choose anyone (like `192.168.1.200`) as `<desired_IP>`. The `<subnet_mask>` is the subnet mask that we will set to the interface. In this example, the home router LAN is `/24`, which means that all the devices in the LAN will coincide in the first 24 bits preffix (`192.168.1.*`). Therefore, It is advisable to use the same mask for our interface; in this way, our interface would recognize any `192.168.1.*` device as though it were in the same LAN. The configuration would result in `static ip_address=192.168.1.200/24`
+
+Now, we will connect Raspberry Pi to power supply and then, from any computer in the home router LAN (e.g. your laptop), we need to connect via SSH to Raspberry Pi. Open PowerShell on Windows or GNU Bash Shell on Linux and run:
+
+```Shell
+ssh <SSH_auxiliar_iface_IP>
+```
+
+The next step is to install on Raspberry Pi's OS the tools described in Section [[1.8](#18-important-tools-for-this-project)]:
+
+```Shell
+sudo apt update #Update package repository database
+sudo apt install hostapd #Install hostapd
+sudo apt install dhcpcd5 #Install dhcpcd (if not yet)
+sudo apt install tshark #Install tshark
+sudo apt install bridge-utils #Install bridge-utils
+```
+
+Now, we are going to configure each tool to make WAP work.
+
+### dhcpcd configuration
+We have to use `dhcpcd` to configure static IP Addresses for the `wlan0` WiFi interface and the future `br0` bridge interface that we will configure later. Note that for both interfaces we cannot do IP reservation in home router, since none of them will connect to home router; `wlan0` will be WAP itself and `br0` will be a bridge between `wlan0` and `eth0`.
+Nonetheless, we need an IP Address for `wlan0` due to ARP protocol
+
+### dhcpcd configuration
+
 
 ---
 ---
@@ -213,3 +279,5 @@ The following APT (_Advanced Packaging Tool_, the tool for managing software pac
 - [12] [NIST - AES algorithm details](https://www.nist.gov/publications/advanced-encryption-standard-aes)
 - [13] [dhcpcd tool - Arch Linux documentation page](https://wiki.archlinux.org/title/Dhcpcd)
 - [14] [OUI Lookup Tool](https://www.wireshark.org/tools/oui-lookup.html)
+- [15] [What's my IP Address?](ifconfig.me/ip)
+- [16] [Bridging connections - Debian Wiki](https://wiki.debian.org/BridgeNetworkConnections#Bridging_Network_Connections)
